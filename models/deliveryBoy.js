@@ -1,0 +1,17 @@
+const mongoose = require('mongoose');
+
+const deliveryBoySchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    phoneNumber: { type: Number, required: true, unique: true },
+    password: { type: String, required: true },
+    vehicleType: { type: String, enum: ['bike', 'car', 'scooter'], required: true },
+    vehicleNumber: { type: String, required: true, unique: true },
+    role: { type: String, enum: ['deliveryBoy'], default: 'deliveryBoy' },
+    status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+    deliveryArea: { type: String, required: true },
+    assignedOrders: { type: [mongoose.Schema.Types.ObjectId], ref: 'Order', default: [] },
+});
+
+const DeliveryBoy = mongoose.model('DeliveryBoy', deliveryBoySchema);
+module.exports = DeliveryBoy;
