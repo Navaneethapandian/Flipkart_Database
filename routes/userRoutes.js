@@ -13,16 +13,13 @@ router.post("/verify-otp", userController.verifyOtp);
 router.post("/forget-password", userController.forgetPassword);
 router.post("/change-password", authenticateToken, authorizeRole("user"), userController.changePassword);
 
-// Products & Delivery
-router.get("/products", userController.productDetails); // get all products
-router.get("/delivery-boys", userController.deliveryBoyDetails); // get all delivery boys
+router.get("/products", userController.productDetails); 
+router.get("/delivery-boys", userController.deliveryBoyDetails); 
 
-// Cart (use logged in user from JWT)
 router.post("/cart/:id", authenticateToken, authorizeRole("user"), userController.addtoCart);
 router.get("/cart/:id", authenticateToken, authorizeRole("user"), userController.viewCart);
 router.delete("/cart/:id", authenticateToken, authorizeRole("user"), userController.clearCart);
 
-// Orders
 router.post("/orders", authenticateToken, authorizeRole("user"), userController.addOrders);
 router.get("/orders/:id/track", authenticateToken, authorizeRole("user"), userController.trackOrder);
 
