@@ -44,7 +44,7 @@ const loginAdmin = async (req, res) => {
     sendEmail(admin.email,'Login Successful!');
     res.status(200).json({ admin, token });
   } catch (err) {
-    console.error(err.message);
+    console.error(err.message); 
     res.status(500).send("Server error");
   }
 };

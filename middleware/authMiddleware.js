@@ -1,8 +1,7 @@
- const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const config = require("../config/db");
 
 const authenticateToken=(req,res,next)=>{
-  console.log("-----inside authenticate")
   const token = req.headers['authorization'];
   console.log("---------token",token)
   if(!token)
@@ -16,7 +15,6 @@ const authenticateToken=(req,res,next)=>{
 };
 
 const authorizeRole=(role)=>{
-   console.log("-----role")
   return (req,res,next)=>{
   if(!role.includes(req.user.role)){
       return res.status(403).json({error:'Forbidden'});
