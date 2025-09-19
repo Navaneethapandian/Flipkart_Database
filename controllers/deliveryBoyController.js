@@ -40,7 +40,7 @@ const deliveryBoyRegister = async (req, res) => {
     });
 
     await newDeliveryBoy.save();
-    sendEmail(newDeliveryBoy.email,'Account Created!',`Hi ${newDeliveryBoy.name}.Your Email: ${newDeliveryBoy.email} and Your Password: ${password}`);
+    sendEmail(newDeliveryBoy.email,'Account Created!',`Hi ${newDeliveryBoy.username}.Your Email: ${newDeliveryBoy.email} and Your Password: ${password}`);
     res.status(201).json({
       message: "Delivery boy registered successfully",
       deliveryBoy: newDeliveryBoy,
