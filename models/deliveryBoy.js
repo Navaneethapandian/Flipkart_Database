@@ -12,6 +12,9 @@ const deliveryBoySchema = new mongoose.Schema({
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
     deliveryArea: { type: String, required: true },
     assignedOrders: { type: [mongoose.Schema.Types.ObjectId], ref: 'Order', default: [assignOrder] },
+    profileImage: {
+        type:String,
+      },
 });
 
 const DeliveryBoy = mongoose.model('DeliveryBoy', deliveryBoySchema);

@@ -6,6 +6,9 @@ const adminSchema = new mongoose.Schema({
     password: { type: String, required: true },   
     role: { type: String, enum: ['admin'], default: 'admin' },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+    profileImage: {
+        type:String,
+      },
 });
 
 const Admin = mongoose.model('Admin', adminSchema);

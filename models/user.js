@@ -9,6 +9,9 @@ const userSchema = new mongoose.Schema({
   status: { type: String, enum: ["active", "inactive"], default: "active" },
   address: { type: String, required: true },
   paymentMethods: { type: String, enum: ["gpay", "cash"], required: true },
+  profileImage: {
+        type:String,
+      },
   cart: [
     {
       productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
