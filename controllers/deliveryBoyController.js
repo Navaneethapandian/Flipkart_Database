@@ -178,7 +178,8 @@ const getAssignedOrders = async (req, res) => {
   try {
     const deliveryBoyId = req.params.id;
 
-    const orders = await Order.find({ assignedTo: deliveryBoyId });
+    // match the field name in Order schema
+    const orders = await Order.find({ deliveryBoysId: deliveryBoyId });
 
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: "No orders assigned yet" });

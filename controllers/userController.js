@@ -6,7 +6,6 @@ const config = require('../config/db');
 const bcrypt = require("bcryptjs"); 
 const jwt = require("jsonwebtoken");
 
-// ================== AUTH ==================
 const registerUser = async (req, res) => {
   try {
     const { username, email, phoneNumber, password } = req.body;

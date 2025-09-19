@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { assignOrder } = require('../controllers/adminController');
 
 const deliveryBoySchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
@@ -10,7 +11,7 @@ const deliveryBoySchema = new mongoose.Schema({
     role: { type: String, enum: ['deliveryBoy'], default: 'deliveryBoy' },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
     deliveryArea: { type: String, required: true },
-    assignedOrders: { type: [mongoose.Schema.Types.ObjectId], ref: 'Order', default: [] },
+    assignedOrders: { type: [mongoose.Schema.Types.ObjectId], ref: 'Order', default: [assignOrder] },
 });
 
 const DeliveryBoy = mongoose.model('DeliveryBoy', deliveryBoySchema);

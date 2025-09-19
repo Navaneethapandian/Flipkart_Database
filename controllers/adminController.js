@@ -333,11 +333,15 @@ const assignOrder = async (req, res) => {
     if (!order) return res.status(404).json({ error: "Order not found" });
 
     const deliveryBoy = await DeliveryBoy.findById(deliveryBoysId);
-    if (!deliveryBoy) return res.status(404).json({ error: "Delivery boy not found" });
-
-    order.deliveryBoysId = deliveryBoysId;
-    order.status = "Assigned";
-    await order.save();
+    if (!deliveryBoy)
+       return res.status(404).json({ error: "Delivery boy not found" });
+       order.deliveryBoysId = deliveryBoysId;
+       order.status = "Assigned";
+       await order.save();
+    if (!deliveryBoy.assignedOrders.includes(orderId)) {
+      deliveryBoy.assignedOrders.push(orderId);
+    }
+    await deliveryBoy.save();
 
     res.status(200).json({ message: "Order assigned successfully", order });
   } catch (err) {
@@ -345,7 +349,6 @@ const assignOrder = async (req, res) => {
   }
 };
 
-// -------------------- EXPORT --------------------
 
 module.exports = {
   registerAdmin,

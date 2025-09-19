@@ -3,72 +3,37 @@ const router = express.Router();
 const adminController = require("../controllers/adminController");
 const { authenticateToken, authorizeRole } = require("../middleware/authMiddleware");
 
-// Destructure controller functions for cleaner usage
-const {
-  registerAdmin,
-  loginAdmin,
-  getAdminProfile,
-  UpdateAdmin,
-  deleteAdmin,
-  addProduct,
-  updateProduct,
-  deleteProduct,
-  productStock,
-  viewAllProducts,
-  viewAllUsers,
-  updateUser,
-  deleteUser,
-  updateDeliveryBoy,
-  deleteDeliveryBoy,
-  viewAllDeliveryBoys,
-  deleteOrder,
-  viewAllOrders,
-  getUserReports,
-  getProductReports,
-  getOrderReports,
-  getRevenueReports,
-  assignOrder,
-} = adminController;
+router.post("/adminRegister", adminController.registerAdmin);
+router.post("/adminLogin", adminController.loginAdmin);
 
-// 🔹 Auth
-router.post("/adminRegister", registerAdmin);
-router.post("/adminLogin", loginAdmin);
+router.get("/getAdminProfile", authenticateToken, authorizeRole("admin"),adminController.getAdminProfile);
 
-// 🔹 Admin Profile
-router.get("/getAdminProfile", authenticateToken, authorizeRole("admin"), getAdminProfile);
+router.put("/updateAdmin/:id", authenticateToken, authorizeRole("admin"), adminController.UpdateAdmin);
+router.delete("/deleteAdmin/:adminId", authenticateToken, authorizeRole("admin"), adminController.deleteAdmin);
 
-// 🔹 Admin CRUD
-router.put("/updateAdmin/:id", authenticateToken, authorizeRole("admin"), UpdateAdmin);
-router.delete("/deleteAdmin/:adminId", authenticateToken, authorizeRole("admin"), deleteAdmin);
+router.post("/addProduct", authenticateToken, authorizeRole("admin"), adminController.addProduct);
+router.put("/updateProduct/:productId", authenticateToken, authorizeRole("admin"), adminController.updateProduct);
+router.delete("/deleteProduct/:productId", authenticateToken, authorizeRole("admin"), adminController.deleteProduct);
+router.delete("/deleteProduct/:productId", authenticateToken, authorizeRole("admin"), adminController.deleteProduct);
+router.put("/productStock/:id", authenticateToken, authorizeRole("admin"), adminController.productStock);
+router.get("/viewAllProducts", authenticateToken, authorizeRole("admin"), adminController.viewAllProducts);
 
-// 🔹 Product Management
-router.post("/addProduct", authenticateToken, authorizeRole("admin"), addProduct);
-router.put("/updateProduct/:productId", authenticateToken, authorizeRole("admin"), updateProduct);
-router.delete("/deleteProduct/:productId", authenticateToken, authorizeRole("admin"), deleteProduct);
-router.put("/productStock/:id", authenticateToken, authorizeRole("admin"), productStock);
-router.get("/viewAllProducts", authenticateToken, authorizeRole("admin"), viewAllProducts);
+router.get("/viewAllUsers", authenticateToken, authorizeRole("admin"), adminController.viewAllUsers);
+router.put("/updateUser/:userId", authenticateToken, authorizeRole("admin"), adminController.updateUser);
+router.delete("/deleteUser/:userId", authenticateToken, authorizeRole("admin"), adminController.deleteUser);
 
-// 🔹 User Management
-router.get("/viewAllUsers", authenticateToken, authorizeRole("admin"), viewAllUsers);
-router.put("/updateUser/:userId", authenticateToken, authorizeRole("admin"), updateUser);
-router.delete("/deleteUser/:userId", authenticateToken, authorizeRole("admin"), deleteUser);
+router.put("/updateDeliveryBoy/:deliveryBoyId", authenticateToken, authorizeRole("admin"), adminController.updateDeliveryBoy);
+router.delete("/deleteDeliveryBoy/:deliveryBoyId", authenticateToken, authorizeRole("admin"), adminController.deleteDeliveryBoy);
+router.get("/viewAllDeliveryBoys", authenticateToken, authorizeRole("admin"), adminController.viewAllDeliveryBoys);
 
-// 🔹 Delivery Boy Management
-router.put("/updateDeliveryBoy/:deliveryBoyId", authenticateToken, authorizeRole("admin"), updateDeliveryBoy);
-router.delete("/deleteDeliveryBoy/:deliveryBoyId", authenticateToken, authorizeRole("admin"), deleteDeliveryBoy);
-router.get("/viewAllDeliveryBoys", authenticateToken, authorizeRole("admin"), viewAllDeliveryBoys);
+router.delete("/deleteOrder/:orderId", authenticateToken, authorizeRole("admin"), adminController.deleteOrder);
+router.get("/viewAllOrders", authenticateToken, authorizeRole("admin"), adminController.viewAllOrders);
 
-// 🔹 Order Management
-router.delete("/deleteOrder/:orderId", authenticateToken, authorizeRole("admin"), deleteOrder);
-router.get("/viewAllOrders", authenticateToken, authorizeRole("admin"), viewAllOrders);
+router.post("/assign-order", authenticateToken, authorizeRole("admin"), adminController.assignOrder);
 
-// 🔹 Assign Orders
-router.post("/assign-order", authenticateToken, authorizeRole("admin"), assignOrder);
-
-// 🔹 Reports
-router.get("/getUserReports", authenticateToken, authorizeRole("admin"), getUserReports);
-router.get("/getProductReports", authenticateToken, authorizeRole("admin"), getProductReports);
-router.get("/getOrderReports", authenticateToken, authorizeRole("admin"), getOrderReports);
-router.get("/getRevenueReports", authenticateToken, authorizeRole("admin"), getRevenueReports);
+router.get("/getUserReports", authenticateToken, authorizeRole("admin"), adminController.getUserReports);
+router.get("/getProductReports", authenticateToken, authorizeRole("admin"), adminController.getProductReports);
+router.get("/getOrderReports", authenticateToken, authorizeRole("admin"), adminController.getOrderReports);
+router.get("/getRevenueReports", authenticateToken, authorizeRole("admin"), adminController.getRevenueReports);
 
 module.exports = router;
