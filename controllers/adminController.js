@@ -22,7 +22,7 @@ const registerAdmin = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newAdmin = new Admin({ username, email, phoneNumber, password: hashedPassword, role, status , profileImage });
     await newAdmin.save();
-    sendEmail(newAdmin.email,'Account Created!',`Hi ${newAdmin.name}.Your Email: ${newAdmin.email} and Your Password: ${password}`);
+    sendEmail(newAdmin.email,'Account Created!',`Hi ${newAdmin.username}.Your Email: ${newAdmin.email} and Your Password: ${password}`);
     res.status(201).json({ message: "Admin registered successfully", admin: newAdmin });
   } catch (err) {
     console.error(err.message);
