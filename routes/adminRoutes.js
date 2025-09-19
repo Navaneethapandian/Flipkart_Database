@@ -11,7 +11,7 @@ router.post("/adminLogin", adminController.loginAdmin);
 
 router.get("/getAdminProfile", authenticateToken, authorizeRole("admin"),adminController.getAdminProfile);
 
-router.put("/updateAdmin/:id", authenticateToken, authorizeRole("admin"), adminController.UpdateAdmin);
+router.put("/updateAdmin/:id", authenticateToken, authorizeRole("admin"),adminUpload.single('profileImage'), adminController.UpdateAdmin);
 router.delete("/deleteAdmin/:id", adminController.deleteAdmin);
 
 router.post("/addProduct", authenticateToken, authorizeRole("admin"), adminController.addProduct);

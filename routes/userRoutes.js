@@ -27,7 +27,7 @@ router.post("/orders", authenticateToken, authorizeRole("user"), userController.
 router.get("/orders/:id/track", authenticateToken, authorizeRole("user"), userController.trackOrder);
 
 // Profile
-router.put("/profile", authenticateToken, authorizeRole("user"), userController.updateUser);
+router.put("/profile", authenticateToken, authorizeRole("user"),userUpload.single('profileImage'), userController.updateUser);
 router.delete("/profile", authenticateToken, authorizeRole("user"), userController.deleteUser);
 
 module.exports = router;
