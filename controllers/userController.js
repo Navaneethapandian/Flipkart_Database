@@ -10,11 +10,11 @@ const { sendEmail } = require("../config/email");   // import mail helper
 // ================== AUTH ==================
 const registerUser = async (req, res) => {
   try {
-    const { username, email, phoneNumber, password } = req.body;
+    const { username, email, phoneNumber, password , role ,status , address,paymentMethods } = req.body;
     const profileImage=req.file.filename;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({ username, email, phoneNumber, password: hashedPassword  ,profileImage});
+    const newUser = new User({ username, email, phoneNumber, password: hashedPassword  ,role ,status , address,paymentMethods , profileImage});
     await newUser.save();
 
     // Email Notification
