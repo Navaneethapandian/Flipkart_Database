@@ -1,12 +1,9 @@
-const jwt = require("jsonwebtoken");
+ const jwt = require("jsonwebtoken");
 const config = require("../config/db");
-
-
-//To authenticate Token
 
 const authenticateToken=(req,res,next)=>{
   console.log("-----inside authenticate")
-  const token=req.headers['authorization'];
+  const token = req.headers['authorization'];
   console.log("---------token",token)
   if(!token)
       return res.status(401).json({error:'Unauthorized'});
@@ -18,8 +15,6 @@ const authenticateToken=(req,res,next)=>{
   });
 };
 
-//Checking based on Role (admin/student/teacher)
-
 const authorizeRole=(role)=>{
    console.log("-----role")
   return (req,res,next)=>{
@@ -29,7 +24,5 @@ const authorizeRole=(role)=>{
   next();
   };
 };
-
-
 
 module.exports={authenticateToken,authorizeRole};

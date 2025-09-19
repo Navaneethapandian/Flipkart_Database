@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
+const {userUpload}=require('../config/multerConfig');
+const {uploadDoc}=require('../config/multerConfig');
 const { authenticateToken, authorizeRole } = require("../middleware/authMiddleware");
 
 // Auth
-router.post("/register", userController.registerUser);
+router.post("/register",userUpload.single('profileImage'), userController.registerUser);
 router.post("/login", userController.loginUser);
 router.post("/send-otp", userController.sendOTP);
 router.post("/verify-otp", userController.verifyOtp);

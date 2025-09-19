@@ -1,15 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/adminController");
+const {adminUpload}=require('../config/multerConfig');
+const {uploadDoc}=require('../config/multerConfig');
 const { authenticateToken, authorizeRole } = require("../middleware/authMiddleware");
 
-router.post("/adminRegister", adminController.registerAdmin);
+router.post("/adminRegister",adminUpload.single('profileImage'), adminController.registerAdmin);
+
 router.post("/adminLogin", adminController.loginAdmin);
 
 router.get("/getAdminProfile", authenticateToken, authorizeRole("admin"),adminController.getAdminProfile);
 
 router.put("/updateAdmin/:id", authenticateToken, authorizeRole("admin"), adminController.UpdateAdmin);
-router.delete("/deleteAdmin/:adminId", authenticateToken, authorizeRole("admin"), adminController.deleteAdmin);
+router.delete("/deleteAdmin/:id", adminController.deleteAdmin);
 
 router.post("/addProduct", authenticateToken, authorizeRole("admin"), adminController.addProduct);
 router.put("/updateProduct/:productId", authenticateToken, authorizeRole("admin"), adminController.updateProduct);

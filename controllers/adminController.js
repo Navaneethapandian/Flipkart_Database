@@ -6,6 +6,8 @@ const Product = require("../models/product");
 const config = require('../config/db');
 const bcrypt = require("bcryptjs"); 
 const jwt = require("jsonwebtoken");
+const {sendEmail}=require('../config/email');
+
 
 // -------------------- AUTH --------------------
 
@@ -13,14 +15,14 @@ const jwt = require("jsonwebtoken");
 const registerAdmin = async (req, res) => {
   try {
     const { username, email, phoneNumber, password, role, status } = req.body;
-
+    const profileImage=req.file.filename;
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) return res.status(400).json({ message: "Admin already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newAdmin = new Admin({ username, email, phoneNumber, password: hashedPassword, role, status });
+    const newAdmin = new Admin({ username, email, phoneNumber, password: hashedPassword, role, status , profileImage });
     await newAdmin.save();
-
+    sendEmail(newAdmin.email,'Account Created!',`Hi ${newAdmin.name}.Your Email: ${newAdmin.email} and Your Password: ${password}`);
     res.status(201).json({ message: "Admin registered successfully", admin: newAdmin });
   } catch (err) {
     console.error(err.message);
@@ -39,6 +41,7 @@ const loginAdmin = async (req, res) => {
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
     const token = jwt.sign({ userId: admin._id, role: 'admin' }, config.jwtSecret, { expiresIn: "30d" });
+    sendEmail(admin.email,'Login Successful!');
     res.status(200).json({ admin, token });
   } catch (err) {
     console.error(err.message);
@@ -52,6 +55,10 @@ const UpdateAdmin = async (req, res) => {
   try {
     const adminId = req.params.id;
     const { username, email, phoneNumber, password, role, status } = req.body;
+    let profileImage = req.body.profileImage;
+    if (req.file && req.file.filename) {
+      profileImage = req.file.filename;
+    }
 
     const admin = await Admin.findById(adminId);
     if (!admin) return res.status(404).json({ error: "Admin not found" });
@@ -62,8 +69,10 @@ const UpdateAdmin = async (req, res) => {
     if (password) admin.password = await bcrypt.hash(password, 10);
     if (role) admin.role = role;
     if (status) admin.status = status;
+    if (profileImage) admin.profileImage = profileImage;
 
     const updatedAdmin = await admin.save();
+    sendEmail(updatedAdmin.email,"Profile Updated","Your admin profile has been updated successfully!");
     res.status(200).json({ message: "Admin updated successfully", admin: updatedAdmin });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -90,6 +99,7 @@ const deleteAdmin = async (req, res) => {
     if (!admin) return res.status(404).json({ error: "Admin not found" });
 
     await admin.deleteOne();
+    sendEmail(admin.email,"Account Deleted","Your admin account has been deleted.");
     res.status(200).json({ message: "Admin deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -173,6 +183,8 @@ const updateUser = async (req, res) => {
 
     Object.assign(user, updates);
     await user.save();
+    sendEmail(user.email,"Profile Updated","Your user profile has been updated successfully.");
+
     res.status(200).json({ message: "User updated successfully", user });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -186,6 +198,7 @@ const deleteUser = async (req, res) => {
     if (!user) return res.status(404).json({ error: "User not found" });
 
     await user.deleteOne();
+    sendEmail(user.email,"Account Deleted","Your account has been deleted.");
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -203,6 +216,7 @@ const updateDeliveryBoy = async (req, res) => {
 
     Object.assign(deliveryBoy, updates);
     await deliveryBoy.save();
+    sendEmail(deliveryBoy.email,"Profile Updated","Your delivery boy profile has been updated.");
     res.status(200).json({ message: "Delivery Boy updated successfully", deliveryBoy });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -216,6 +230,8 @@ const deleteDeliveryBoy = async (req, res) => {
     if (!deliveryBoy) return res.status(404).json({ error: "Delivery Boy not found" });
 
     await deliveryBoy.deleteOne();
+    
+    sendEmail(deliveryBoy.email,"Account Deleted","Your delivery boy account has been deleted.");
     res.status(200).json({ message: "Delivery Boy deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -342,13 +358,14 @@ const assignOrder = async (req, res) => {
       deliveryBoy.assignedOrders.push(orderId);
     }
     await deliveryBoy.save();
+      
+    sendEmail(deliveryBoy.email,"New Order Assigned",`You have been assigned to deliver order ${orderId}.`);
 
     res.status(200).json({ message: "Order assigned successfully", order });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 module.exports = {
   registerAdmin,
