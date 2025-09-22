@@ -22,6 +22,7 @@
     "multer": "^2.0.2",
     "nodemailer": "^7.0.6",
     "path": "^0.12.7",
-    "router": "^2.2.0"
+    "router": "^2.2.0",
+    "socket.io": "^4.8.1"
   }
 }
