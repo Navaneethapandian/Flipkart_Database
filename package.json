@@ -17,6 +17,7 @@
     "express": "^4.15.2",
     "fs": "^0.0.1-security",
     "http": "^0.0.1-security",
+    "io": "^1.5.7",
     "jsonwebtoken": "^9.0.2",
     "mailer": "^0.6.7",
     "mongoose": "^8.18.1",
