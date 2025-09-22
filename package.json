@@ -24,6 +24,7 @@
     "mailer": "^0.6.7",
     "mongoose": "^8.18.1",
     "multer": "^2.0.2",
+    "node.js": "^0.0.1-security",
     "nodemailer": "^7.0.6",
     "nodemon": "^3.1.10",
     "package": "^1.0.1",
