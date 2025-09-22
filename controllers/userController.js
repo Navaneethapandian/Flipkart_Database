@@ -5,13 +5,14 @@ const DeliveryBoy = require('../models/deliveryBoy');
 const config = require('../config/db');
 const bcrypt = require("bcryptjs"); 
 const jwt = require("jsonwebtoken");
+const path = require('path');
 const { sendEmail } = require("../config/email");   // import mail helper
 
 // ================== AUTH ==================
 const registerUser = async (req, res) => {
   try {
     const { username, email, phoneNumber, password , role ,status , address,paymentMethods } = req.body;
-    const profileImage=req.file.filename;
+    const profileImage = req.file ? path.resolve(req.file.path) : null;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({ username, email, phoneNumber, password: hashedPassword  ,role ,status , address,paymentMethods , profileImage});

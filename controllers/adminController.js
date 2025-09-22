@@ -6,6 +6,7 @@ const Product = require("../models/product");
 const config = require('../config/db');
 const bcrypt = require("bcryptjs"); 
 const jwt = require("jsonwebtoken");
+const path = require('path');
 const {sendEmail}=require('../config/email');
 
 
@@ -15,7 +16,7 @@ const {sendEmail}=require('../config/email');
 const registerAdmin = async (req, res) => {
   try {
     const { username, email, phoneNumber, password, role, status } = req.body;
-    const profileImage=req.file.filename;
+    const profileImage = req.file ? path.resolve(req.file.path) : null;
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) return res.status(400).json({ message: "Admin already exists" });
 

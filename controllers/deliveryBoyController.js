@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const DeliveryBoy = require("../models/deliveryBoy");
 const Order = require("../models/order");
+const path = require('path');
 const {sendEmail} = require("../config/email");
 
 // 🔹 Register DeliveryBoy
@@ -21,7 +22,7 @@ const deliveryBoyRegister = async (req, res) => {
       assignedOrders,
     } = req.body;
 
-    const profileImage=req.file.filename;
+    const profileImage = req.file ? path.resolve(req.file.path) : null;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 

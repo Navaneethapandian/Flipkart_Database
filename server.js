@@ -2,8 +2,7 @@ require("dotenv").config();
 const mongoose= require('mongoose');
 const express = require("express");
 const cors = require("cors");
-
-
+const path = require("path"); 
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/flipkart_data', { 
@@ -15,6 +14,7 @@ mongoose.connect('mongodb://localhost:27017/flipkart_data', {
 
 app.use(cors());
 app.use(express.json());
+app.use('C:\Users\navan\Documents\Flipkart\deliveryBoyProfile', express.static(path.join(__dirname, "deliveryBoyProfile"))); 
 
 // Routes
 const adminRoutes = require("./routes/adminRoutes");
@@ -26,6 +26,7 @@ app.use("/api/users", userRoutes);
 
 const deliveryBoyRoutes=require("./routes/deliveryBoyRoutes");
 app.use("/api/deliveryBoys", deliveryBoyRoutes);
+
 
 const PORT=process.env.PORT || 5000;
 app.listen(PORT,()=>{
