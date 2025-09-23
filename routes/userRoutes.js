@@ -27,6 +27,7 @@ router.put("/profile", authenticateToken, authorizeRole("user"),userUpload.singl
 router.delete("/profile", authenticateToken, authorizeRole("user"), userController.deleteUser);
 router.post("/send-message",authenticateToken,authorizeRole("user"),userController.sendUserMessage);
 router.get("/get-message",authenticateToken, authorizeRole("user"), userController.getAllUserChats);
+router.get("/get-message/:chatId",authenticateToken, authorizeRole("user"), userController.getAllUserChats);
 router.delete("/delete-message/:chatId",authenticateToken, authorizeRole("user"), userController.deleteUserChat);
 
 module.exports = router;

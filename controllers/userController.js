@@ -264,22 +264,16 @@ const trackOrder = async (req, res) => {
 const handleUserMessage = async ({ io, senderId, role, message, profileImage = "", meta = {}, res }) => {
   try {
     if (!message) {
-      if (res && !res.headersSent) return res.status(400).json({ error: "Message is required" });
+      if (res) return res.status(400).json({ error: "Message is required" });
       return;
     }
-    if (!senderId) {
-      if (res && !res.headersSent) return res.status(401).json({ error: "SenderId is required" });
-      return;
-    }
-
     const chat = await Chat.create({ senderRole: role, senderId, message, profileImage });
     const chatData = { id: chat._id, role, senderId, message: chat.message, profileImage: chat.profileImage, timestamp: chat.timestamp || chat.createdAt };
-
     if (io) io.emit("chat message", chatData);
-    if (res && !res.headersSent) return res.status(201).json({ success: true, message: chatData });
+    if (res) return res.status(201).json({ success: true, message: chatData });
   } catch (err) {
     console.error(`${role} message error:`, err);
-    if (res && !res.headersSent) return res.status(500).json({ error: err.message });
+    if (res) return res.status(500).json({ error: err.message });
   }
 };
 
