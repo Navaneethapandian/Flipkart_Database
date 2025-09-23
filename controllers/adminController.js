@@ -8,11 +8,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const path = require('path');
 const {sendEmail}=require('../config/email');
+const Chat = require("../models/chat");
 
-
-// -------------------- AUTH --------------------
-
-// Admin registration
 const registerAdmin = async (req, res) => {
   try {
     const { username, email, phoneNumber, password, role, status } = req.body;
@@ -368,6 +365,61 @@ const assignOrder = async (req, res) => {
   }
 };
 
+
+const handleAdminMessage = async ({ io, senderId, message, meta = {}, res }) => {
+  try {
+    if (!message) {
+      if (res) return res.status(400).json({ error: "Message is required" });
+      return;
+    }
+
+    const chat = await Chat.create({
+      senderRole: "Admin",
+      senderId,
+      message,
+      meta
+    });
+
+    const chatData = {
+      id: chat._id,
+      role: "Admin",
+      senderId,
+      message: chat.message,
+      timestamp: chat.timestamp || chat.createdAt
+    };
+
+    if (io) {
+      io.emit("chat message", chatData);
+    }
+
+    if (res) {
+      return res.status(201).json({ success: true, message: chatData });
+    }
+  } catch (err) {
+    console.error("Admin message error:", err);
+    if (res) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+};
+
+const sendAdminMessage = async (req, res) => {
+  const adminId = req.user && (req.user.userId || req.user.id);
+  const { message } = req.body;
+
+  return handleAdminMessage({
+    io: req.io,
+    senderId: adminId,
+    message,
+    res
+  });
+};
+
+const adminSocketHandler = async (io, data, socket) => {
+  const { senderId, message, meta } = data;
+  return handleAdminMessage({ io, senderId, message, meta });
+};
+
 module.exports = {
   registerAdmin,
   loginAdmin,
@@ -392,4 +444,8 @@ module.exports = {
   getOrderReports,
   getRevenueReports,
   assignOrder,
+  adminSocketHandler,
+  sendAdminMessage,
+  adminSocketHandler,  
 };
+

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat App</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    ul { list-style: none; padding: 0; }
+    li { background: #f2f2f2; margin: 5px; padding: 8px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h2>Socket.IO Chat</h2>
+  <ul id="messages"></ul>
+  <form id="form">
+    <input id="input" autocomplete="off" placeholder="Type a message..." />
+    <button>Send</button>
+  </form>
+
+  <script>
+    const socket = io("http://localhost:5000"); // connect to backend
+    const form = document.getElementById("form");
+    const input = document.getElementById("input");
+    const messages = document.getElementById("messages");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (input.value) {
+        socket.emit("chat message", input.value);
+        input.value = "";
+      }
+    });
+
+    socket.on("chat message", (msg) => {
+      const li = document.createElement("li");
+      li.textContent = msg;
+      messages.appendChild(li);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  </script>
+</body>
+</html>

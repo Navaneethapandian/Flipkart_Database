@@ -4,6 +4,8 @@ const {deliveryBoyUpload}=require('../config/multerConfig');
 const {uploadDoc}=require('../config/multerConfig');
 const deliveryBoyController = require("../controllers/deliveryBoyController");
 const { authenticateToken, authorizeRole } = require("../middleware/authMiddleware");
+const {sendDeliveryBoyMessage}=require('../controllers/deliveryBoyController');
+const { route } = require("./adminRoutes");
 
 router.post("/register",deliveryBoyUpload.single('profileImage'), deliveryBoyController.deliveryBoyRegister);
 
@@ -26,5 +28,6 @@ router.get("/orders/:id", authenticateToken, authorizeRole("deliveryBoy"), deliv
 router.get("/assigned-orders/:id",authenticateToken, authorizeRole("deliveryBoy"), deliveryBoyController.viewAssignedOrders);
 
 router.put("/order-status/:id",authenticateToken,authorizeRole("deliveryBoy"),deliveryBoyController.updateOrderStatus);
+router.post("/send-message",authenticateToken,authorizeRole("deliveryBoy"),deliveryBoyController.sendDeliveryBoyMessage);
 
 module.exports = router;

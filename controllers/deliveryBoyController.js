@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const DeliveryBoy = require("../models/deliveryBoy");
 const Order = require("../models/order");
 const path = require('path');
+const Chat = require("../models/chat");
 const {sendEmail} = require("../config/email");
 
 // 🔹 Register DeliveryBoy
@@ -281,6 +282,63 @@ const updateDeliveryBoyProfile = async (req, res) => {
   }
 };
 
+const handleMessage = async ({ io, senderId, message, role, meta = {}, res }) => {
+  try {
+    if (!message) {
+      if (res) return res.status(400).json({ error: "Message is required" });
+      return;
+    }
+
+    const chat = await Chat.create({
+      senderRole: role,
+      senderId,
+      message,
+      meta
+    });
+
+    const chatData = {
+      id: chat._id,
+      role,
+      senderId,
+      message: chat.message,
+      timestamp: chat.timestamp || chat.createdAt
+    };
+
+    // Emit to all connected clients
+    if (io) {
+      io.emit("chat message", chatData);
+    }
+
+    // Send HTTP response if available
+    if (res) {
+      return res.status(201).json({ success: true, message: chatData });
+    }
+  } catch (err) {
+    console.error(`${role} message error:`, err);
+    if (res) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+};
+
+const sendDeliveryBoyMessage = async (req, res) => {
+  const deliveryBoyId = req.user && (req.user.userId || req.user.id);
+  const { message } = req.body;
+
+  return handleMessage({
+    io: req.io,
+    senderId: deliveryBoyId,
+    message,
+    role: "DeliveryBoy",
+    res
+  });
+};
+
+const deliveryBoySocketHandler = async (io, data, socket) => {
+  const { senderId, message, meta } = data;
+  return handleMessage({ io, senderId, message, role: "DeliveryBoy", meta });
+};
+
 module.exports = {
   deliveryBoyRegister,
   deliveryBoyLogin,
@@ -295,4 +353,7 @@ module.exports = {
   updateOrderStatus,
   getProfile,
   updateDeliveryBoyProfile,
+  handleMessage,
+  sendDeliveryBoyMessage,
+  deliveryBoySocketHandler,
 };
