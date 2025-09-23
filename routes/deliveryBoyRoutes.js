@@ -30,7 +30,7 @@ router.get("/assigned-orders/:id",authenticateToken, authorizeRole("deliveryBoy"
 router.put("/order-status/:id",authenticateToken,authorizeRole("deliveryBoy"),deliveryBoyController.updateOrderStatus);
 router.post("/send-message",authenticateToken,authorizeRole("deliveryBoy"),deliveryBoyController.sendDeliveryBoyMessage);
 router.get("/get-message",authenticateToken, authorizeRole("user"), deliveryBoyController.getAllDeliveryBoyChats);
-router.delete("/delete-message",authenticateToken, authorizeRole("user"), deliveryBoyController.deleteDeliveryBoyChat);
+router.delete("/delete-message/:chatId",authenticateToken, authorizeRole("user"), deliveryBoyController.deleteDeliveryBoyChat);
 
 
 module.exports = router;

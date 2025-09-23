@@ -12,16 +12,14 @@ const Chat = require('../models/chat');
 // ================== AUTH ==================
 const registerUser = async (req, res) => {
   try {
-    const { username, email, phoneNumber, password , role ,status , address,paymentMethods } = req.body;
+    const { username, email, phoneNumber, password, role, status, address, paymentMethods } = req.body;
     const profileImage = req.file ? path.resolve(req.file.path) : null;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({ username, email, phoneNumber, password: hashedPassword  ,role ,status , address,paymentMethods , profileImage});
+    const newUser = new User({ username, email, phoneNumber, password: hashedPassword, role, status, address, paymentMethods, profileImage });
     await newUser.save();
 
-    // Email Notification
     await sendEmail(email, "Welcome to Flipkart Clone", `Hello ${username}, your account has been created successfully!`);
-
     res.status(201).json({ message: "User registered successfully", user: newUser });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -37,9 +35,7 @@ const loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign({ userId: user._id, role: 'user' }, config.jwtSecret, { expiresIn: "30d" });
-
-    // Email Notification
+    const token = jwt.sign({ userId: user._id, role: 'User' }, config.jwtSecret, { expiresIn: "30d" });
     await sendEmail(email, "Login Successful", `Hi ${user.username}, you have logged in successfully!`);
 
     res.status(200).json({ user, token });
@@ -59,9 +55,7 @@ const sendOTP = async (req, res) => {
     user.otp = otp;
     await user.save();
 
-    // Email Notification
     await sendEmail(email, "Your OTP Code", `Your OTP for verification is ${otp}`);
-
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -74,14 +68,11 @@ const verifyOtp = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    if (user.otp !== otp) return res.status(400).json({ error: "Invalid OTP" });
+    if (user.otp != otp) return res.status(400).json({ error: "Invalid OTP" });
 
     user.otp = null;
     await user.save();
-
-    // Email Notification
     await sendEmail(email, "OTP Verified", "Your OTP has been successfully verified!");
-
     res.status(200).json({ message: "OTP verified successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -96,10 +87,7 @@ const forgetPassword = async (req, res) => {
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
-
-    // Email Notification
     await sendEmail(email, "Password Reset Successful", "Your password has been updated successfully.");
-
     res.status(200).json({ message: "Password changed successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -114,10 +102,7 @@ const changePassword = async (req, res) => {
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
-
-    // Email Notification
     await sendEmail(email, "Password Changed", "Your password has been successfully changed.");
-
     res.status(200).json({ message: "Password changed successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -128,13 +113,9 @@ const changePassword = async (req, res) => {
 const addOrders = async (req, res) => {
   try {
     const { userId, products, totalAmount, address, status, paymentStatus, orderDate, deliveryDate } = req.body;
-
     const newOrder = new Order({
       userId,
-      products: products.map(p => ({
-        productId: p.productId,
-        stock: parseInt(p.stock, 10)
-      })),
+      products: products.map(p => ({ productId: p.productId, stock: parseInt(p.stock, 10) })),
       totalAmount,
       address,
       status: status || 'pending',
@@ -144,12 +125,8 @@ const addOrders = async (req, res) => {
     });
 
     await newOrder.save();
-
     const user = await User.findById(userId);
-
-    // Email Notification
     await sendEmail(user.email, "Order Placed", `Your order has been placed successfully. Order ID: ${newOrder._id}`);
-
     res.status(201).json({ message: "Order added successfully", order: newOrder });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -200,10 +177,7 @@ const clearCart = async (req, res) => {
 
     user.cart = [];
     await user.save();
-
-    // Email Notification
     await sendEmail(user.email, "Cart Cleared", "Your shopping cart has been cleared.");
-
     res.status(200).json({ message: "Cart cleared successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -216,9 +190,7 @@ const updateUser = async (req, res) => {
     const userId = req.params.id;
     const { username, email, phoneNumber, password, role, status, address, paymentMethods } = req.body;
     let profileImage = req.body.profileImage;
-    if (req.file && req.file.filename) {
-      profileImage = req.file.filename;
-    }
+    if (req.file && req.file.filename) profileImage = req.file.filename;
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
@@ -231,12 +203,10 @@ const updateUser = async (req, res) => {
     if (status) user.status = status;
     if (address) user.address = address;
     if (paymentMethods) user.paymentMethods = paymentMethods;
-    if(profileImage) user.profileImage = profileImage;
+    if (profileImage) user.profileImage = profileImage;
     await user.save();
 
-    // Email Notification
     await sendEmail(user.email, "Profile Updated", "Your account details have been updated successfully.");
-
     res.status(200).json({ message: "User updated successfully", user });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -246,15 +216,11 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
-
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
     await user.deleteOne();
-
-    // Email Notification
     await sendEmail(user.email, "Account Deleted", "Your account has been deleted from our system.");
-
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -287,80 +253,60 @@ const trackOrder = async (req, res) => {
     if (!order) return res.status(404).json({ error: "Order not found" });
 
     const user = await User.findById(order.userId);
-
-    // Email Notification
     await sendEmail(user.email, "Order Tracking", `You are tracking order ID: ${order._id}, Current Status: ${order.status}`);
-
     res.status(200).json({ order });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-const handleUserMessage = async ({ io, senderId, message, role, meta = {}, res }) => {
+// ================== CHAT ==================
+const handleUserMessage = async ({ io, senderId, role, message, profileImage = "", meta = {}, res }) => {
   try {
     if (!message) {
-      if (res) return res.status(400).json({ error: "Message is required" });
+      if (res && !res.headersSent) return res.status(400).json({ error: "Message is required" });
+      return;
+    }
+    if (!senderId) {
+      if (res && !res.headersSent) return res.status(401).json({ error: "SenderId is required" });
       return;
     }
 
-    const chat = await Chat.create({
-      senderRole: role,
-      senderId,
-      message,
-      meta
-    });
+    const chat = await Chat.create({ senderRole: role, senderId, message, profileImage });
+    const chatData = { id: chat._id, role, senderId, message: chat.message, profileImage: chat.profileImage, timestamp: chat.timestamp || chat.createdAt };
 
-    const chatData = {
-      id: chat._id,
-      role,
-      senderId,
-      message: chat.message,
-      timestamp: chat.timestamp || chat.createdAt
-    };
-
-    // Emit to all connected clients
-    if (io) {
-      io.emit("chat message", chatData);
-    }
-
-    // Send HTTP response if available
-    if (res) {
-      return res.status(201).json({ success: true, message: chatData });
-    }
+    if (io) io.emit("chat message", chatData);
+    if (res && !res.headersSent) return res.status(201).json({ success: true, message: chatData });
   } catch (err) {
     console.error(`${role} message error:`, err);
-    if (res) {
-      return res.status(500).json({ error: err.message });
-    }
+    if (res && !res.headersSent) return res.status(500).json({ error: err.message });
   }
 };
 
 const sendUserMessage = async (req, res) => {
-  const userId = req.user && (req.user.userId || req.user.id);
-  const { message } = req.body;
+  try {
+    const { message } = req.body;
+    const senderId = req.user.userId;           // JWT auth middleware must set req.user
+    const role = "User";
+    const profileImage = req.user.profileImage || "";
 
-  return handleMessage({
-    io: req.io,
-    senderId: userId,
-    message,
-    role: "User",
-    res
-  });
+    return handleUserMessage({ io: req.io, senderId, role, message, profileImage, res });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 const getAllUserChats = async (req, res) => {
   try {
     const chats = await Chat.find()
       .sort({ timestamp: 1 })
-      .populate('senderId', 'name profileImage'); // dynamic refPath population
+      .populate('senderId', 'username profileImage');
     res.status(200).json({ success: true, chats });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// REST API: Delete Chat by ID
 const deleteUserChat = async (req, res) => {
   try {
     const { chatId } = req.params;
@@ -373,10 +319,10 @@ const deleteUserChat = async (req, res) => {
 
 const userSocketHandler = async (io, data, socket) => {
   const { senderId, message, meta } = data;
-  return handleUserMessage({ io, senderId, message, role: "User", meta });
+  return handleUserMessage({ io, senderId, role: "User", message, meta });
 };
 
-
+// ================== EXPORT ==================
 module.exports = {
   registerUser,
   loginUser,

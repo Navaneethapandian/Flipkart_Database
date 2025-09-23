@@ -41,8 +41,8 @@ router.get("/getOrderReports", authenticateToken, authorizeRole("admin"), adminC
 router.get("/getRevenueReports", authenticateToken, authorizeRole("admin"), adminController.getRevenueReports);
 
 router.post("/send-message",  authenticateToken, authorizeRole("admin"), adminController.sendAdminMessage);
-router.get("/get-message",authenticateToken, authorizeRole("user"), adminController.getAllAdminChats);
-router.delete("/delete-message",authenticateToken, authorizeRole("user"), adminController.deleteAdminChat);
+router.get("/get-message",authenticateToken, authorizeRole("admin"), adminController.getAllAdminChats);
+router.delete("/delete-message/:chatId",authenticateToken, authorizeRole("admin"), adminController.deleteAdminChat);
 
 
 module.exports = router;

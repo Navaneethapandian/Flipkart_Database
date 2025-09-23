@@ -382,9 +382,10 @@ const handleAdminMessage = async ({ io, senderId, message, meta = {}, res }) => 
 
     const chatData = {
       id: chat._id,
-      role: "Admin",
+      role: "Admin",         // or dynamic role
       senderId,
       message: chat.message,
+      profileImage: chat.profileImage || "",  // add this line
       timestamp: chat.timestamp || chat.createdAt
     };
 
@@ -470,5 +471,6 @@ module.exports = {
   adminSocketHandler,  
   getAllAdminChats,
   deleteAdminChat,
+  handleAdminMessage,
 };
 
