@@ -26,6 +26,9 @@ app.use(express.json());
 // Static folder for profile images
 app.use("/profileImages", express.static(path.join(__dirname, "profileImages")));
 
+const deliveryBoyRoutes = require("./routes/deliveryBoyRoutes");
+app.use("/api/deliveryBoys", deliveryBoyRoutes);
+
 // Attach io to req
 app.use((req, res, next) => {
   req.io = io;
@@ -35,7 +38,6 @@ app.use((req, res, next) => {
 // Routes
 app.use("/api/admins", require("./routes/adminRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
-app.use("/api/deliveryBoys", require("./routes/deliveryBoyRoutes"));
 
 
 io.on("connection", (socket) => {

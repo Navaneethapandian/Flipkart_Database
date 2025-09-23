@@ -15,7 +15,16 @@ const userSchema = new mongoose.Schema({
       productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
       stock: { type: Number, default: 1 }
     }
-  ]
+  ],
+  chat: [
+          {
+              senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+              receiverId: { type: mongoose.Schema.Types.ObjectId }, 
+              message: { type: String, required: true },
+              profileImage: { type: String, default: "" }, 
+              timestamp: { type: Date, default: Date.now }
+          }
+      ]
 });
 
 const User = mongoose.model("User", userSchema);

@@ -13,6 +13,15 @@ const deliveryBoySchema = new mongoose.Schema({
     deliveryArea: { type: String, required: true },
     assignedOrders: { type: [mongoose.Schema.Types.ObjectId], ref: 'Order', default: [assignOrder] },
     profileImage: { type:String  },
+    chat: [
+            {
+                senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'DeliveryBoy' },
+                receiverId: { type: mongoose.Schema.Types.ObjectId }, // or User
+                message: { type: String, required: true },
+                profileImage: { type: String, default: "" }, 
+                timestamp: { type: Date, default: Date.now }
+            }
+        ]
 });
 
 const DeliveryBoy = mongoose.model('DeliveryBoy', deliveryBoySchema);

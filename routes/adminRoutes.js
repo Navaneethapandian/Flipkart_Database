@@ -42,6 +42,7 @@ router.get("/getRevenueReports", authenticateToken, authorizeRole("admin"), admi
 
 router.post("/send-message",  authenticateToken, authorizeRole("admin"), adminController.sendAdminMessage);
 router.get("/get-message",authenticateToken, authorizeRole("admin"), adminController.getAllAdminChats);
+router.get("/get-message/:id",authenticateToken, authorizeRole("admin"), adminController.getAllAdminChats);
 router.delete("/delete-message/:chatId",authenticateToken, authorizeRole("admin"), adminController.deleteAdminChat);
 
 

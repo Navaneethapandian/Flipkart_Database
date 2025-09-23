@@ -407,23 +407,46 @@ const handleAdminMessage = async ({ io, senderId, message, meta = {}, res }) => 
 const sendAdminMessage = async (req, res) => {
   const adminId = req.user && (req.user.userId || req.user.id);
   const { message } = req.body;
+  const profileImage = sender.profileImage || "";
+
 
   return handleAdminMessage({
     io: req.io,
     senderId: adminId,
     message,
+    profileImage,
     res
   });
 };
 
 const getAllAdminChats = async (req, res) => {
   try {
-    const chats = await Chat.find()
-      .sort({ timestamp: 1 })
-      .populate('senderId', 'name profileImage');
-    res.status(200).json({ success: true, chats });
+    const { id } = req.params;
+    const role = req.user.role;       
+    let chats;
+    if (role === "user") {
+      chats = await Chat.find({
+        $or: [{ senderId: id }, { receiverId: id }]
+      }).sort({ timestamp: 1 });
+    } else if (role === "admin") {
+      chats = await Chat.find({
+        $or: [{ senderId: id }, { receiverId: id }]
+      }).sort({ timestamp: 1 });
+     } else if (role === "deliveryBoy") {
+        chats = await Chat.find({
+        $or: [{ senderId: id }, { receiverId: id }]
+      }).sort({ timestamp: 1 });
+    } else {
+      return res.status(403).json({ success: false, message: "Unauthorized role" });
+    }
+    res.status(200).json({
+      success: true,
+      count: chats.length,
+      messages: chats
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Error fetching chats:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
