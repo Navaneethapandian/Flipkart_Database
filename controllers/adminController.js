@@ -415,6 +415,27 @@ const sendAdminMessage = async (req, res) => {
   });
 };
 
+const getAllAdminChats = async (req, res) => {
+  try {
+    const chats = await Chat.find()
+      .sort({ timestamp: 1 })
+      .populate('senderId', 'name profileImage');
+    res.status(200).json({ success: true, chats });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const deleteAdminChat = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    await Chat.findByIdAndDelete(chatId);
+    res.status(200).json({ success: true, message: "Chat deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 const adminSocketHandler = async (io, data, socket) => {
   const { senderId, message, meta } = data;
   return handleAdminMessage({ io, senderId, message, meta });
@@ -447,5 +468,7 @@ module.exports = {
   adminSocketHandler,
   sendAdminMessage,
   adminSocketHandler,  
+  getAllAdminChats,
+  deleteAdminChat,
 };
 

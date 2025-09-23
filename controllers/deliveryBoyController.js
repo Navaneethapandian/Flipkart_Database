@@ -281,8 +281,7 @@ const updateDeliveryBoyProfile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-const handleMessage = async ({ io, senderId, message, role, meta = {}, res }) => {
+const handleDeliveryBoyMessage = async ({ io, senderId, message, meta = {}, res }) => {
   try {
     if (!message) {
       if (res) return res.status(400).json({ error: "Message is required" });
@@ -290,7 +289,7 @@ const handleMessage = async ({ io, senderId, message, role, meta = {}, res }) =>
     }
 
     const chat = await Chat.create({
-      senderRole: role,
+      senderRole: "DeliveryBoy",
       senderId,
       message,
       meta
@@ -298,23 +297,21 @@ const handleMessage = async ({ io, senderId, message, role, meta = {}, res }) =>
 
     const chatData = {
       id: chat._id,
-      role,
+      role: "DeliveryBoy",
       senderId,
       message: chat.message,
       timestamp: chat.timestamp || chat.createdAt
     };
 
-    // Emit to all connected clients
     if (io) {
       io.emit("chat message", chatData);
     }
 
-    // Send HTTP response if available
     if (res) {
       return res.status(201).json({ success: true, message: chatData });
     }
   } catch (err) {
-    console.error(`${role} message error:`, err);
+    console.error("DeliveryBoy message error:", err);
     if (res) {
       return res.status(500).json({ error: err.message });
     }
@@ -322,21 +319,41 @@ const handleMessage = async ({ io, senderId, message, role, meta = {}, res }) =>
 };
 
 const sendDeliveryBoyMessage = async (req, res) => {
-  const deliveryBoyId = req.user && (req.user.userId || req.user.id);
+  const DeliveryBoyId = req.user && (req.user.userId || req.user.id);
   const { message } = req.body;
 
-  return handleMessage({
+  return handleDeliveryBoyMessage({
     io: req.io,
-    senderId: deliveryBoyId,
+    senderId: adminId,
     message,
-    role: "DeliveryBoy",
     res
   });
 };
 
-const deliveryBoySocketHandler = async (io, data, socket) => {
+const getAllDeliveryBoyChats = async (req, res) => {
+  try {
+    const chats = await Chat.find()
+      .sort({ timestamp: 1 })
+      .populate('senderId', 'name profileImage');
+    res.status(200).json({ success: true, chats });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const deleteDeliveryBoyChat = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    await Chat.findByIdAndDelete(chatId);
+    res.status(200).json({ success: true, message: "Chat deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const DeliveryBoySocketHandler = async (io, data, socket) => {
   const { senderId, message, meta } = data;
-  return handleMessage({ io, senderId, message, role: "DeliveryBoy", meta });
+  return handleDeliveryBoyMessage({ io, senderId, message, meta });
 };
 
 module.exports = {
@@ -353,7 +370,9 @@ module.exports = {
   updateOrderStatus,
   getProfile,
   updateDeliveryBoyProfile,
-  handleMessage,
+  handleDeliveryBoyMessage,
+  deleteDeliveryBoyChat,
   sendDeliveryBoyMessage,
-  deliveryBoySocketHandler,
+  getAllDeliveryBoyChats,
+  DeliveryBoySocketHandler,
 };

@@ -4,7 +4,7 @@ const {deliveryBoyUpload}=require('../config/multerConfig');
 const {uploadDoc}=require('../config/multerConfig');
 const deliveryBoyController = require("../controllers/deliveryBoyController");
 const { authenticateToken, authorizeRole } = require("../middleware/authMiddleware");
-const {sendDeliveryBoyMessage}=require('../controllers/deliveryBoyController');
+const {sendDeliveryBoyMessage,getAllDeliveryBoyChats,deleteDeliveryBoyChat}=require('../controllers/deliveryBoyController');
 const { route } = require("./adminRoutes");
 
 router.post("/register",deliveryBoyUpload.single('profileImage'), deliveryBoyController.deliveryBoyRegister);
@@ -29,5 +29,8 @@ router.get("/assigned-orders/:id",authenticateToken, authorizeRole("deliveryBoy"
 
 router.put("/order-status/:id",authenticateToken,authorizeRole("deliveryBoy"),deliveryBoyController.updateOrderStatus);
 router.post("/send-message",authenticateToken,authorizeRole("deliveryBoy"),deliveryBoyController.sendDeliveryBoyMessage);
+router.get("/get-message",authenticateToken, authorizeRole("user"), deliveryBoyController.getAllDeliveryBoyChats);
+router.delete("/delete-message",authenticateToken, authorizeRole("user"), deliveryBoyController.deleteDeliveryBoyChat);
+
 
 module.exports = router;

@@ -297,7 +297,7 @@ const trackOrder = async (req, res) => {
   }
 };
 
-const handleMessage = async ({ io, senderId, message, role, meta = {}, res }) => {
+const handleUserMessage = async ({ io, senderId, message, role, meta = {}, res }) => {
   try {
     if (!message) {
       if (res) return res.status(400).json({ error: "Message is required" });
@@ -349,9 +349,31 @@ const sendUserMessage = async (req, res) => {
   });
 };
 
+const getAllUserChats = async (req, res) => {
+  try {
+    const chats = await Chat.find()
+      .sort({ timestamp: 1 })
+      .populate('senderId', 'name profileImage'); // dynamic refPath population
+    res.status(200).json({ success: true, chats });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// REST API: Delete Chat by ID
+const deleteUserChat = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    await Chat.findByIdAndDelete(chatId);
+    res.status(200).json({ success: true, message: "Chat deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 const userSocketHandler = async (io, data, socket) => {
   const { senderId, message, meta } = data;
-  return handleMessage({ io, senderId, message, role: "User", meta });
+  return handleUserMessage({ io, senderId, message, role: "User", meta });
 };
 
 
@@ -371,7 +393,9 @@ module.exports = {
   productDetails,
   deliveryBoyDetails,
   trackOrder,
-  handleMessage,
+  handleUserMessage,
   sendUserMessage,
   userSocketHandler,
+  getAllUserChats,
+  deleteUserChat,
 };

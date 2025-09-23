@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/adminController");
 const {adminUpload}=require('../config/multerConfig');
-const {sendAdminMessage}=require('../controllers/adminController')
+const {sendAdminMessage,getAllAdminChats,deleteAdminChat}=require('../controllers/adminController')
 const {uploadDoc}=require('../config/multerConfig');
 const { authenticateToken, authorizeRole } = require("../middleware/authMiddleware");
 
@@ -39,7 +39,10 @@ router.get("/getUserReports", authenticateToken, authorizeRole("admin"), adminCo
 router.get("/getProductReports", authenticateToken, authorizeRole("admin"), adminController.getProductReports);
 router.get("/getOrderReports", authenticateToken, authorizeRole("admin"), adminController.getOrderReports);
 router.get("/getRevenueReports", authenticateToken, authorizeRole("admin"), adminController.getRevenueReports);
+
 router.post("/send-message",  authenticateToken, authorizeRole("admin"), adminController.sendAdminMessage);
+router.get("/get-message",authenticateToken, authorizeRole("user"), adminController.getAllAdminChats);
+router.delete("/delete-message",authenticateToken, authorizeRole("user"), adminController.deleteAdminChat);
 
 
 module.exports = router;

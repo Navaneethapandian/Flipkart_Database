@@ -4,7 +4,7 @@ const userController = require("../controllers/userController");
 const {userUpload}=require('../config/multerConfig');
 const {uploadDoc}=require('../config/multerConfig');
 const { authenticateToken, authorizeRole } = require("../middleware/authMiddleware");
-const {sendUserMessage}=require('../controllers/userController');
+const {sendUserMessage,getAllUserChats,deleteUserChat}=require('../controllers/userController');
 // Auth
 router.post("/register",userUpload.single('profileImage'), userController.registerUser);
 router.post("/login", userController.loginUser);
@@ -26,5 +26,7 @@ router.get("/orders/:id/track", authenticateToken, authorizeRole("user"), userCo
 router.put("/profile", authenticateToken, authorizeRole("user"),userUpload.single('profileImage'), userController.updateUser);
 router.delete("/profile", authenticateToken, authorizeRole("user"), userController.deleteUser);
 router.post("/send-message",authenticateToken,authorizeRole("user"),userController.sendUserMessage);
+router.get("/get-message",authenticateToken, authorizeRole("user"), userController.getAllUserChats);
+router.delete("/delete-message",authenticateToken, authorizeRole("user"), userController.deleteUserChat);
 
 module.exports = router;
