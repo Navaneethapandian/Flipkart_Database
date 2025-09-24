@@ -279,13 +279,20 @@ const handleUserMessage = async ({ io, senderId, role, message, profileImage = "
 
 const sendUserMessage = async (req, res) => {
   try {
-    const { message } = req.body;
-    const senderId = req.user.userId;           // JWT auth middleware must set req.user
-    const role = "User";
-    const profileImage = req.user.profileImage || "";
+    const message = req.body.message || ""; 
+    const senderId = req.user.id;           
+    const profileImage = req.file ? req.file.path : req.user.profileImage || "";
+    const chat = await Chat.create({
+      senderId: senderId,      
+      senderRole: "User",
+      message: message,
+      profileImage: profileImage
+    });
+    console.log("-------------profileImage",profileImage);
 
-    return handleUserMessage({ io: req.io, senderId, role, message, profileImage, res });
+    res.status(201).json({ success: true, chat });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };

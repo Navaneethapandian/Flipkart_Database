@@ -296,13 +296,12 @@ const sendDeliveryBoyMessage = async (req, res) => {
     });
     console.log("-------------profileImage",profileImage);
 
-    res.status(201).json({ success: true, chat });
+    res.status(201).json({  chat });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
-
 
 
 // 🔹 Get All Chats

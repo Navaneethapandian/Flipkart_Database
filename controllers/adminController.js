@@ -28,7 +28,6 @@ const registerAdmin = async (req, res) => {
   }
 };
 
-// Admin login
 const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -46,8 +45,6 @@ const loginAdmin = async (req, res) => {
     res.status(500).send("Server error");
   }
 };
-
-// -------------------- ADMIN CRUD --------------------
 
 const UpdateAdmin = async (req, res) => {
   try {
@@ -104,7 +101,6 @@ const deleteAdmin = async (req, res) => {
   }
 };
 
-// -------------------- PRODUCT CRUD --------------------
 
 const addProduct = async (req, res) => {
   try {
@@ -170,8 +166,6 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-// -------------------- USER CRUD --------------------
-
 const updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -203,7 +197,6 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// -------------------- DELIVERY BOY CRUD --------------------
 
 const updateDeliveryBoy = async (req, res) => {
   try {
@@ -291,9 +284,6 @@ const viewAllOrders = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// -------------------- REPORTS --------------------
-
 const getUserReports = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
@@ -382,10 +372,10 @@ const handleAdminMessage = async ({ io, senderId, message, meta = {}, res }) => 
 
     const chatData = {
       id: chat._id,
-      role: "Admin",         // or dynamic role
+      role: "Admin",         
       senderId,
       message: chat.message,
-      profileImage: chat.profileImage || "",  // add this line
+      profileImage: chat.profileImage || "",  
       timestamp: chat.timestamp || chat.createdAt
     };
 
@@ -405,20 +395,24 @@ const handleAdminMessage = async ({ io, senderId, message, meta = {}, res }) => 
 };
 
 const sendAdminMessage = async (req, res) => {
-  const adminId = req.user && (req.user.userId || req.user.id);
-  const { message } = req.body;
-  const profileImage = sender.profileImage || "";
+  try {
+    const message = req.body.message || ""; 
+    const senderId = req.user.id;           
+    const profileImage = req.file ? req.file.path : req.user.profileImage || "";
+    const chat = await Chat.create({
+      senderId: senderId,      
+      senderRole: "Admin",
+      message: message,
+      profileImage: profileImage
+    });
+    console.log("-------------profileImage",profileImage);
 
-
-  return handleAdminMessage({
-    io: req.io,
-    senderId: adminId,
-    message,
-    profileImage,
-    res
-  });
+    res.status(201).json({ success: true, chat });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 };
-
 const getAllAdminChats = async (req, res) => {
   try {
     const { id } = req.params;
